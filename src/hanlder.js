@@ -1,31 +1,21 @@
 import { nanoid } from 'nanoid';
 import books from './books.js';
 import CommonResponse from './common_response.js';
-import Joi from '@hapi/joi';
+import { validateBookPayload } from './validator.js';
 
 const addBookHandler = (request, h) => {
-  const schema = Joi.object({
-    name: Joi.string().required().messages({
-      'any.required': 'Gagal menambahkan buku. Mohon isi nama buku',
-      'string.empty': 'Gagal menambahkan buku. Mohon isi nama buku'
-    }),
-    year: Joi.number().allow(null),
-    author: Joi.string().allow(null),
-    summary: Joi.string().allow(null),
-    publisher: Joi.string().allow(null),
-    pageCount: Joi.number().required(),
-    readPage: Joi.number().required().max(Joi.ref('pageCount')).messages({
-      'number.max': 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount'
-    }),
-    reading: Joi.boolean().allow(null),
-  });
+  const customMessages = {
+    nameRequiredMessage: 'Gagal menambahkan buku. Mohon isi nama buku',
+    nameEmptyMessage: 'Gagal menambahkan buku. Mohon isi nama buku',
+    readPageMaxMessage: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount'
+  };
 
-  const { error } = schema.validate(request.payload);
+  const validation = validateBookPayload(request.payload, customMessages);
 
-  if (error) {
+  if (!validation.isValid) {
     return h.response({
       status: 'fail',
-      message: error.details[0].message
+      message: validation.message
     }).code(400);
   }
 
@@ -46,7 +36,7 @@ const addBookHandler = (request, h) => {
     ).code(201);
   } else {
     return h.response(
-      new CommonResponse('error', 'Buku gagal ditambahkan')
+      new CommonResponse('fail', 'Buku gagal ditambahkan')
     ).code(500);
   }
 };
@@ -74,28 +64,18 @@ const getDeatilBookHandler = (request, h) => {
 };
 
 const updateBookHandler = (request, h) => {
-  const schema = Joi.object({
-    name: Joi.string().required().messages({
-      'any.required': 'Gagal memperbarui buku. Mohon isi nama buku',
-      'string.empty': 'Gagal memperbarui buku. Mohon isi nama buku'
-    }),
-    year: Joi.number().allow(null),
-    author: Joi.string().allow(null),
-    summary: Joi.string().allow(null),
-    publisher: Joi.string().allow(null),
-    pageCount: Joi.number().required(),
-    readPage: Joi.number().required().max(Joi.ref('pageCount')).messages({
-      'number.max': 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount'
-    }),
-    reading: Joi.boolean().allow(null),
-  });
+  const customMessages = {
+    nameRequiredMessage: 'Gagal memperbarui buku. Mohon isi nama buku',
+    nameEmptyMessage: 'Gagal memperbarui buku. Mohon isi nama buku',
+    readPageMaxMessage: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount'
+  };
 
-  const { error } = schema.validate(request.payload);
+  const validation = validateBookPayload(request.payload, customMessages);
 
-  if (error) {
+  if (!validation.isValid) {
     return h.response({
       status: 'fail',
-      message: error.details[0].message
+      message: validation.message
     }).code(400);
   }
 
@@ -117,14 +97,16 @@ const updateBookHandler = (request, h) => {
       reading,
       updatedAt: new Date().toISOString()
     };
+
     return h.response(
       new CommonResponse('success', 'Buku berhasil diperbarui')
     ).code(200);
   } else {
     return h.response(
-      new CommonResponse('fail', 'Gagal memperbarui buku. Id tidak ditemukan')
+      new CommonResponse('fail', 'Buku tidak ditemukan')
     ).code(404);
   }
 };
+
 
 export { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler };
