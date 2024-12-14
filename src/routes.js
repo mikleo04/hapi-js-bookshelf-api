@@ -1,4 +1,4 @@
-import { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler } from './hanlder.js';
+import { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler, deleteBookHandler } from './hanlder.js';
 
 const routes = [
   {
@@ -20,6 +20,11 @@ const routes = [
     method: 'PUT',
     path: '/books/{bookId}',
     handler: updateBookHandler
+  },
+  {
+    method: 'DELETE',
+    path: '/books/{bookId}',
+    handler: deleteBookHandler
   },
 ];
 

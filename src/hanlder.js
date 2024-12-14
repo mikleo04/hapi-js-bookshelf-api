@@ -108,5 +108,20 @@ const updateBookHandler = (request, h) => {
   }
 };
 
+const deleteBookHandler = (request, h) => {
+  const { bookId } = request.params;
+  const bookIndex = books.findIndex((book) => book.id === bookId);
 
-export { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler };
+  if (bookIndex !== -1) {
+    books.splice(bookIndex, 1);
+    return h.response(
+      new CommonResponse('success', 'Buku berhasil dihapus')
+    ).code(200);
+  } else {
+    return h.response(
+      new CommonResponse('fail', 'Buku gagal dihapus. Id tidak ditemukan')
+    ).code(404);
+  }
+};
+
+export { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler,  deleteBookHandler };
