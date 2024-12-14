@@ -73,4 +73,58 @@ const getDeatilBookHandler = (request, h) => {
   }
 };
 
-export { addBookHandler, getAllBooksHandler, getDeatilBookHandler };
+const updateBookHandler = (request, h) => {
+  const schema = Joi.object({
+    name: Joi.string().required().messages({
+      'any.required': 'Gagal memperbarui buku. Mohon isi nama buku',
+      'string.empty': 'Gagal memperbarui buku. Mohon isi nama buku'
+    }),
+    year: Joi.number().allow(null),
+    author: Joi.string().allow(null),
+    summary: Joi.string().allow(null),
+    publisher: Joi.string().allow(null),
+    pageCount: Joi.number().required(),
+    readPage: Joi.number().required().max(Joi.ref('pageCount')).messages({
+      'number.max': 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount'
+    }),
+    reading: Joi.boolean().allow(null),
+  });
+
+  const { error } = schema.validate(request.payload);
+
+  if (error) {
+    return h.response({
+      status: 'fail',
+      message: error.details[0].message
+    }).code(400);
+  }
+
+  const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
+  const { bookId } = request.params;
+
+  const bookIndex = books.findIndex((book) => book.id === bookId);
+
+  if (bookIndex !== -1) {
+    books[bookIndex] = {
+      ...books[bookIndex],
+      name,
+      year,
+      author,
+      summary,
+      publisher,
+      pageCount,
+      readPage,
+      reading,
+      updatedAt: new Date().toISOString()
+    };
+    return h.response(
+      new CommonResponse('success', 'Buku berhasil diperbarui')
+    ).code(200);
+  } else {
+    return h.response(
+      new CommonResponse('fail', 'Gagal memperbarui buku. Id tidak ditemukan')
+    ).code(404);
+  }
+};
+
+export { addBookHandler, getAllBooksHandler, getDeatilBookHandler, updateBookHandler };
