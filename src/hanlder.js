@@ -58,4 +58,19 @@ const getAllBooksHandler = (request, h) => {
   ).code(200);
 };
 
-export { addBookHandler, getAllBooksHandler };
+const getDeatilBookHandler = (request, h) => {
+  const { bookId } = request.params;
+  const book = books.filter((book) => book.id === bookId)[0];
+
+  if (book !== undefined && book !== null) {
+    return h.response(
+      new CommonResponse('success', 'Buku berhasil didapatkan', { book })
+    ).code(200);
+  } else {
+    return h.response(
+      new CommonResponse('fail', 'Buku tidak ditemukan')
+    ).code(404);
+  }
+};
+
+export { addBookHandler, getAllBooksHandler, getDeatilBookHandler };
