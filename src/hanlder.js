@@ -120,7 +120,7 @@ const updateBookHandler = (request, h) => {
     ).code(200);
   } else {
     return h.response(
-      new CommonResponse('fail', 'Buku tidak ditemukan')
+      new CommonResponse('fail', 'Gagal memperbarui buku. Id tidak ditemukan')
     ).code(404);
   }
 };
