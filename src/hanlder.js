@@ -51,4 +51,11 @@ const addBookHandler = (request, h) => {
   }
 };
 
-export { addBookHandler };
+const getAllBooksHandler = (request, h) => {
+  const filteredBooks = books.map(({ id, name, publisher }) => ({ id, name, publisher }));
+  return h.response(
+    new CommonResponse('success', 'Buku berhasil didapatkan', { books: filteredBooks })
+  ).code(200);
+};
+
+export { addBookHandler, getAllBooksHandler };
