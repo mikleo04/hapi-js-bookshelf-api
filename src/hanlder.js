@@ -42,9 +42,26 @@ const addBookHandler = (request, h) => {
 };
 
 const getAllBooksHandler = (request, h) => {
-  const filteredBooks = books.map(({ id, name, publisher }) => ({ id, name, publisher }));
+
+  const { name, reading, finished } = request.query;
+  let filteredBooks = books;
+
+  if (name !== undefined) {
+    filteredBooks = filteredBooks.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+  }
+
+  if (reading !== undefined) {
+    filteredBooks = filteredBooks.filter((book) => book.reading === (reading === '1'));
+  }
+
+  if (finished !== undefined) {
+    filteredBooks = filteredBooks.filter((book) => book.finished === (finished === '1'));
+  }
+
+
+  const coverBooks = filteredBooks.map(({ id, name, publisher }) => ({ id, name, publisher }));
   return h.response(
-    new CommonResponse('success', 'Buku berhasil didapatkan', { books: filteredBooks })
+    new CommonResponse('success', 'Buku berhasil didapatkan', { books: coverBooks })
   ).code(200);
 };
 
